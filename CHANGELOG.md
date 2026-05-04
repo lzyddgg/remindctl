@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.2.0 - 2026-05-04
+- Add `creationDate` to reminder JSON output
 - Add `open` filter for all incomplete reminders
 - Accept local ISO 8601 due dates without a timezone suffix
 - Preserve date-only due inputs as all-day reminders instead of midnight reminders
