@@ -7,11 +7,11 @@ enum ListCommand {
     CommandSpec(
       name: "list",
       abstract: "List reminder lists or show list contents",
-      discussion: "Without a name, shows all lists. With a name, shows reminders in that list.",
+      discussion: "Without a name, shows all lists. With one or more names, shows reminders in those lists.",
       signature: CommandSignatures.withRuntimeFlags(
         CommandSignature(
           arguments: [
-            .make(label: "name", help: "List name", isOptional: true)
+            .make(label: "name", help: "List name(s)", isOptional: true)
           ],
           options: [
             .make(
@@ -31,12 +31,13 @@ enum ListCommand {
       usageExamples: [
         "remindctl list",
         "remindctl list Work",
+        "remindctl list Work Errands",
         "remindctl list Work --rename Office",
         "remindctl list Work --delete",
         "remindctl list Projects --create",
       ]
     ) { values, runtime in
-      let name = values.argument(0)
+      let names = values.positional
       let renameTo = values.option("rename")
       let deleteList = values.flag("delete")
       let createList = values.flag("create")
@@ -45,7 +46,11 @@ enum ListCommand {
       let store = RemindersStore()
       try await store.requestAccess()
 
-      if let name {
+      if !names.isEmpty {
+        let name = try singleListName(
+          names,
+          forMutation: deleteList || renameTo != nil || createList
+        )
         if deleteList {
           if !force && !runtime.noInput && Console.isTTY {
             if !Console.confirm("Delete list \"\(name)\"?", defaultValue: false) {
@@ -80,7 +85,7 @@ enum ListCommand {
           return
         }
 
-        let reminders = try await store.reminders(in: name)
+        let reminders = try await reminders(in: names, store: store)
         OutputRenderer.printReminders(reminders, format: runtime.outputFormat)
         return
       }
@@ -108,5 +113,24 @@ enum ListCommand {
 
       OutputRenderer.printLists(summaries, format: runtime.outputFormat)
     }
+  }
+
+  static func singleListName(_ names: [String], forMutation: Bool) throws -> String {
+    guard let name = names.first else {
+      throw ParsedValuesError.missingArgument("name")
+    }
+    if forMutation && names.count > 1 {
+      throw RemindCoreError.operationFailed("Only one list name can be used with create, delete, or rename")
+    }
+    return name
+  }
+
+  private static func reminders(in names: [String], store: RemindersStore) async throws -> [ReminderItem] {
+    var reminders: [ReminderItem] = []
+    var seen = Set<String>()
+    for name in names where seen.insert(name).inserted {
+      reminders.append(contentsOf: try await store.reminders(in: name))
+    }
+    return reminders
   }
 }

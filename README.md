@@ -50,6 +50,7 @@ remindctl list Projects --create
 remindctl add "Buy milk"
 remindctl add --title "Call mom" --list Personal --due tomorrow
 remindctl edit 1 --title "New title" --due 2026-01-04
+remindctl list Work Errands       # show reminders from multiple lists
 remindctl complete 1 2 3
 remindctl delete 4A83 --force
 remindctl status                # permission status
@@ -67,6 +68,9 @@ Accepted by `--due` and filters:
 - `YYYY-MM-DD`
 - `YYYY-MM-DD HH:mm`
 - ISO 8601 (`2026-01-03T12:34:56Z`)
+- Local ISO 8601 without timezone (`2026-01-03T12:34:56`)
+
+Date-only due inputs create all-day reminders; date-time inputs create timed reminders.
 
 ## Permissions
 Run `remindctl authorize` to trigger the system prompt. If access is denied, enable

@@ -30,6 +30,14 @@ struct DateParsingTests {
     #expect(parsed != nil)
   }
 
+  @Test("Local ISO 8601 without timezone parsing")
+  func localISOParsing() {
+    let input = "2026-01-03T12:34:56"
+    let parsed = DateParsing.parseUserDateWithMetadata(input)
+    #expect(parsed != nil)
+    #expect(parsed?.isDateOnly == false)
+  }
+
   @Test("Formatted date parsing")
   func formattedParsing() {
     let input = "2026-01-03 10:30"
@@ -42,5 +50,29 @@ struct DateParsingTests {
     let date = Date(timeIntervalSince1970: 1_700_000_000)
     let output = DateParsing.formatDisplay(date, calendar: calendar)
     #expect(output.isEmpty == false)
+  }
+
+  @Test("Date-only inputs carry metadata")
+  func dateOnlyMetadata() {
+    let now = Date(timeIntervalSince1970: 1_700_000_000)
+
+    let today = DateParsing.parseUserDateWithMetadata("today", now: now, calendar: calendar)
+    #expect(today?.date == calendar.startOfDay(for: now))
+    #expect(today?.isDateOnly == true)
+
+    let dateOnly = DateParsing.parseUserDateWithMetadata("2026-01-03")
+    #expect(dateOnly?.isDateOnly == true)
+
+    let dateTime = DateParsing.parseUserDateWithMetadata("2026-01-03 10:30")
+    #expect(dateTime?.isDateOnly == false)
+  }
+
+  @Test("Display can omit time for all-day reminders")
+  func displayFormattingDateOnly() {
+    let date = Date(timeIntervalSince1970: 1_700_000_000)
+    let timed = DateParsing.formatDisplay(date, calendar: calendar)
+    let dateOnly = DateParsing.formatDisplay(date, isDateOnly: true, calendar: calendar)
+    #expect(dateOnly.isEmpty == false)
+    #expect(timed.count > dateOnly.count)
   }
 }
