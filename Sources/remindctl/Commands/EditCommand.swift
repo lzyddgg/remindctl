@@ -17,6 +17,7 @@ enum EditCommand {
             .make(label: "title", names: [.short("t"), .long("title")], help: "New title", parsing: .singleValue),
             .make(label: "list", names: [.short("l"), .long("list")], help: "Move to list", parsing: .singleValue),
             .make(label: "due", names: [.short("d"), .long("due")], help: "Set due date", parsing: .singleValue),
+            .make(label: "alarm", names: [.short("a"), .long("alarm")], help: "Set alarm date", parsing: .singleValue),
             .make(label: "notes", names: [.short("n"), .long("notes")], help: "Set notes", parsing: .singleValue),
             .make(
               label: "priority",
@@ -27,6 +28,7 @@ enum EditCommand {
           ],
           flags: [
             .make(label: "clearDue", names: [.long("clear-due")], help: "Clear due date"),
+            .make(label: "clearAlarm", names: [.long("clear-alarm")], help: "Clear alarm"),
             .make(label: "complete", names: [.long("complete")], help: "Mark completed"),
             .make(label: "incomplete", names: [.long("incomplete")], help: "Mark incomplete"),
           ]
@@ -35,8 +37,9 @@ enum EditCommand {
       usageExamples: [
         "remindctl edit 1 --title \"New title\"",
         "remindctl edit 4A83 --due tomorrow",
+        "remindctl edit 4A83 --alarm \"2026-01-03 08:55\"",
         "remindctl edit 2 --priority high --notes \"Call before noon\"",
-        "remindctl edit 3 --clear-due",
+        "remindctl edit 3 --clear-due --clear-alarm",
       ]
     ) { values, runtime in
       guard let input = values.argument(0) else {
@@ -54,6 +57,7 @@ enum EditCommand {
       let title = values.option("title")
       let listName = values.option("list")
       let notes = values.option("notes")
+      let alarmValue = values.option("alarm")
 
       var dueUpdate: ParsedUserDate??
       if let dueValue = values.option("due") {
@@ -64,6 +68,17 @@ enum EditCommand {
           throw RemindCoreError.operationFailed("Use either --due or --clear-due, not both")
         }
         dueUpdate = .some(nil)
+      }
+
+      var alarmUpdate: ParsedUserDate??
+      if let alarmValue {
+        alarmUpdate = try CommandHelpers.parseDueDate(alarmValue)
+      }
+      if values.flag("clearAlarm") {
+        if alarmUpdate != nil {
+          throw RemindCoreError.operationFailed("Use either --alarm or --clear-alarm, not both")
+        }
+        alarmUpdate = .some(nil)
       }
 
       var priority: ReminderPriority?
@@ -78,7 +93,10 @@ enum EditCommand {
       }
       let isCompleted: Bool? = completeFlag ? true : (incompleteFlag ? false : nil)
 
-      if title == nil && listName == nil && notes == nil && dueUpdate == nil && priority == nil && isCompleted == nil {
+      let hasChanges =
+        title != nil || listName != nil || notes != nil || dueUpdate != nil || alarmUpdate != nil || priority != nil
+        || isCompleted != nil
+      if !hasChanges {
         throw RemindCoreError.operationFailed("No changes specified")
       }
 
@@ -86,6 +104,7 @@ enum EditCommand {
         title: title,
         notes: notes,
         dueDate: dueUpdate,
+        alarmDate: alarmUpdate,
         priority: priority,
         listName: listName,
         isCompleted: isCompleted

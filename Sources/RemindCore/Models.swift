@@ -54,6 +54,7 @@ public struct ReminderItem: Identifiable, Codable, Sendable, Equatable {
   public let priority: ReminderPriority
   public let dueDate: Date?
   public let dueDateIsAllDay: Bool
+  public let alarmDate: Date?
   public let listID: String
   public let listName: String
 
@@ -68,6 +69,7 @@ public struct ReminderItem: Identifiable, Codable, Sendable, Equatable {
     priority: ReminderPriority,
     dueDate: Date?,
     dueDateIsAllDay: Bool = false,
+    alarmDate: Date? = nil,
     listID: String,
     listName: String
   ) {
@@ -81,6 +83,7 @@ public struct ReminderItem: Identifiable, Codable, Sendable, Equatable {
     self.priority = priority
     self.dueDate = dueDate
     self.dueDateIsAllDay = dueDateIsAllDay
+    self.alarmDate = alarmDate
     self.listID = listID
     self.listName = listName
   }
@@ -90,12 +93,20 @@ public struct ReminderDraft: Sendable {
   public let title: String
   public let notes: String?
   public let dueDate: ParsedUserDate?
+  public let alarmDate: ParsedUserDate?
   public let priority: ReminderPriority
 
-  public init(title: String, notes: String?, dueDate: ParsedUserDate?, priority: ReminderPriority) {
+  public init(
+    title: String,
+    notes: String?,
+    dueDate: ParsedUserDate?,
+    alarmDate: ParsedUserDate? = nil,
+    priority: ReminderPriority
+  ) {
     self.title = title
     self.notes = notes
     self.dueDate = dueDate
+    self.alarmDate = alarmDate
     self.priority = priority
   }
 }
@@ -104,6 +115,7 @@ public struct ReminderUpdate: Sendable {
   public let title: String?
   public let notes: String?
   public let dueDate: ParsedUserDate??
+  public let alarmDate: ParsedUserDate??
   public let priority: ReminderPriority?
   public let listName: String?
   public let isCompleted: Bool?
@@ -112,6 +124,7 @@ public struct ReminderUpdate: Sendable {
     title: String? = nil,
     notes: String? = nil,
     dueDate: ParsedUserDate?? = nil,
+    alarmDate: ParsedUserDate?? = nil,
     priority: ReminderPriority? = nil,
     listName: String? = nil,
     isCompleted: Bool? = nil
@@ -119,6 +132,7 @@ public struct ReminderUpdate: Sendable {
     self.title = title
     self.notes = notes
     self.dueDate = dueDate
+    self.alarmDate = alarmDate
     self.priority = priority
     self.listName = listName
     self.isCompleted = isCompleted

@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.2.0 - 2026-05-04
+- Add EventKit alarm support via `--alarm` and `--clear-alarm`
 - Add reminder `url` to JSON output when EventKit exposes one
 - Add `creationDate` to reminder JSON output
 - Add `open` filter for all incomplete reminders

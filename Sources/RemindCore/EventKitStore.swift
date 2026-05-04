@@ -108,6 +108,11 @@ public actor RemindersStore {
     if let dueDate = draft.dueDate {
       reminder.dueDateComponents = calendarComponents(from: dueDate)
     }
+    if let alarmDate = draft.alarmDate {
+      reminder.addAlarm(EKAlarm(absoluteDate: alarmDate.date))
+    } else if let dueDate = draft.dueDate, !dueDate.isDateOnly {
+      reminder.addAlarm(EKAlarm(absoluteDate: dueDate.date))
+    }
     try eventStore.save(reminder, commit: true)
     return item(from: reminder)
   }
@@ -125,9 +130,15 @@ public actor RemindersStore {
       if let dueDate = dueDateUpdate {
         reminder.dueDateComponents = nil
         reminder.dueDateComponents = calendarComponents(from: dueDate)
+        if update.alarmDate == nil && !dueDate.isDateOnly {
+          replaceAlarms(on: reminder, with: dueDate.date)
+        }
       } else {
         reminder.dueDateComponents = nil
       }
+    }
+    if let alarmDateUpdate = update.alarmDate {
+      replaceAlarms(on: reminder, with: alarmDateUpdate?.date)
     }
     if let priority = update.priority {
       reminder.priority = priority.eventKitValue
@@ -164,7 +175,9 @@ public actor RemindersStore {
     }
     return deleted
   }
+}
 
+extension RemindersStore {
   private func requestFullAccess() async throws -> Bool {
     try await withCheckedThrowingContinuation { continuation in
       eventStore.requestFullAccessToReminders { granted, error in
@@ -189,6 +202,7 @@ public actor RemindersStore {
       let priority: Int
       let dueDateComponents: DateComponents?
       let dueDateIsAllDay: Bool
+      let alarmDate: Date?
       let listID: String
       let listName: String
     }
@@ -209,6 +223,7 @@ public actor RemindersStore {
             priority: Int(reminder.priority),
             dueDateComponents: components,
             dueDateIsAllDay: isAllDay(components),
+            alarmDate: Self.alarmDate(from: reminder),
             listID: reminder.calendar.calendarIdentifier,
             listName: reminder.calendar.title
           )
@@ -229,6 +244,7 @@ public actor RemindersStore {
         priority: ReminderPriority(eventKitValue: data.priority),
         dueDate: date(from: data.dueDateComponents),
         dueDateIsAllDay: data.dueDateIsAllDay,
+        alarmDate: data.alarmDate,
         listID: data.listID,
         listName: data.listName
       )
@@ -279,8 +295,24 @@ public actor RemindersStore {
       priority: ReminderPriority(eventKitValue: Int(reminder.priority)),
       dueDate: date(from: components),
       dueDateIsAllDay: isAllDay(components),
+      alarmDate: Self.alarmDate(from: reminder),
       listID: reminder.calendar.calendarIdentifier,
       listName: reminder.calendar.title
     )
+  }
+
+  private func replaceAlarms(on reminder: EKReminder, with date: Date?) {
+    for alarm in reminder.alarms ?? [] {
+      reminder.removeAlarm(alarm)
+    }
+    if let date {
+      reminder.addAlarm(EKAlarm(absoluteDate: date))
+    }
+  }
+
+  private static func alarmDate(from reminder: EKReminder) -> Date? {
+    reminder.alarms?
+      .compactMap(\.absoluteDate)
+      .min()
   }
 }

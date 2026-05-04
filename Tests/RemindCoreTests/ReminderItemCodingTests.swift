@@ -5,8 +5,8 @@ import Testing
 
 @MainActor
 struct ReminderItemCodingTests {
-  @Test("JSON includes creation date and URL")
-  func jsonIncludesCreationDateAndURL() throws {
+  @Test("JSON includes EventKit metadata")
+  func jsonIncludesEventKitMetadata() throws {
     let item = ReminderItem(
       id: "abc",
       title: "Created",
@@ -17,6 +17,7 @@ struct ReminderItemCodingTests {
       creationDate: Date(timeIntervalSince1970: 1_700_000_000),
       priority: .none,
       dueDate: nil,
+      alarmDate: Date(timeIntervalSince1970: 1_700_000_300),
       listID: "list",
       listName: "Inbox"
     )
@@ -27,5 +28,6 @@ struct ReminderItemCodingTests {
     let json = try #require(String(data: data, encoding: .utf8))
     #expect(json.contains(#""creationDate""#))
     #expect(json.contains(#""url":"https:\/\/example.com""#))
+    #expect(json.contains(#""alarmDate""#))
   }
 }
