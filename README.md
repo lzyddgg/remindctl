@@ -64,7 +64,8 @@ remindctl authorize             # request permissions
 - `--json` emits JSON arrays/objects.
 - `--plain` emits tab-separated lines.
 - `--quiet` emits counts only.
-- JSON includes EventKit metadata such as `creationDate`, `url`, `alarmDate`, and `recurrenceRule` when available.
+- JSON includes EventKit metadata such as `creationDate`, `lastModifiedDate`, `url`, `alarmDate`, and
+  `recurrenceRule` when available.
   File/image attachments are not exposed by EventKit.
 
 ## Date formats

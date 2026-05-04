@@ -205,6 +205,7 @@ extension RemindersStore {
       let isCompleted: Bool
       let completionDate: Date?
       let creationDate: Date?
+      let lastModifiedDate: Date?
       let priority: Int
       let dueDateComponents: DateComponents?
       let dueDateIsAllDay: Bool
@@ -227,6 +228,7 @@ extension RemindersStore {
             isCompleted: reminder.isCompleted,
             completionDate: reminder.completionDate,
             creationDate: reminder.creationDate,
+            lastModifiedDate: reminder.lastModifiedDate,
             priority: Int(reminder.priority),
             dueDateComponents: components,
             dueDateIsAllDay: isAllDay(components),
@@ -249,6 +251,7 @@ extension RemindersStore {
         isCompleted: data.isCompleted,
         completionDate: data.completionDate,
         creationDate: data.creationDate,
+        lastModifiedDate: data.lastModifiedDate,
         priority: ReminderPriority(eventKitValue: data.priority),
         dueDate: date(from: data.dueDateComponents),
         dueDateIsAllDay: data.dueDateIsAllDay,
@@ -301,6 +304,7 @@ extension RemindersStore {
       isCompleted: reminder.isCompleted,
       completionDate: reminder.completionDate,
       creationDate: reminder.creationDate,
+      lastModifiedDate: reminder.lastModifiedDate,
       priority: ReminderPriority(eventKitValue: Int(reminder.priority)),
       dueDate: date(from: components),
       dueDateIsAllDay: isAllDay(components),

@@ -15,6 +15,7 @@ struct ReminderItemCodingTests {
       isCompleted: false,
       completionDate: nil,
       creationDate: Date(timeIntervalSince1970: 1_700_000_000),
+      lastModifiedDate: Date(timeIntervalSince1970: 1_700_000_100),
       priority: .none,
       dueDate: nil,
       alarmDate: Date(timeIntervalSince1970: 1_700_000_300),
@@ -28,6 +29,7 @@ struct ReminderItemCodingTests {
     let data = try encoder.encode(item)
     let json = try #require(String(data: data, encoding: .utf8))
     #expect(json.contains(#""creationDate""#))
+    #expect(json.contains(#""lastModifiedDate""#))
     #expect(json.contains(#""url":"https:\/\/example.com""#))
     #expect(json.contains(#""alarmDate""#))
     #expect(json.contains(#""recurrenceRule""#))

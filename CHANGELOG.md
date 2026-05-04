@@ -4,6 +4,7 @@
 - Add simple recurrence support via `--repeat` and `--no-repeat`
 - Add EventKit alarm support via `--alarm` and `--clear-alarm`
 - Add reminder `url` to JSON output when EventKit exposes one
+- Add `lastModifiedDate` to reminder JSON output
 - Add `creationDate` to reminder JSON output
 - Add `open` filter for all incomplete reminders
 - Accept local ISO 8601 due dates without a timezone suffix
