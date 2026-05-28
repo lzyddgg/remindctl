@@ -1,6 +1,6 @@
-![remindctl banner](docs/assets/readme-banner.jpg)
-
 # remindctl
+
+![remindctl banner](docs/assets/readme-banner.jpg)
 
 Fast command-line access to Apple Reminders on macOS.
 
