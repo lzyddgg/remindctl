@@ -4,6 +4,8 @@ Fast command-line access to Apple Reminders on macOS.
 
 `remindctl` is for scripts, agents, and terminal workflows that need to read and update the same reminders you see in Reminders.app. It uses Apple's public EventKit APIs, so reminders keep syncing through the normal system/iCloud path.
 
+Docs: https://remindctl.sh
+
 ## Install
 
 ### Homebrew

@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: help format lint test check build remindctl clean
+.PHONY: help format lint test check build remindctl docs-site clean
 
 help:
 	@printf "%s\n" \
@@ -10,6 +10,7 @@ help:
 		"make check     - lint + test + coverage gate" \
 		"make build     - release build into bin/ (codesigned)" \
 		"make remindctl - clean rebuild + run debug binary (ARGS=...)" \
+		"make docs-site - build GitHub Pages docs into dist/docs-site" \
 		"make clean     - swift package clean"
 
 format:
@@ -40,6 +41,9 @@ remindctl:
 	swift package clean
 	swift build -c debug --product remindctl
 	./.build/debug/remindctl $(ARGS)
+
+docs-site:
+	node scripts/build-docs-site.mjs
 
 clean:
 	swift package clean

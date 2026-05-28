@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Add a GitHub Pages documentation site for remindctl.sh.
 - Resolve numeric edit/complete/delete indexes against the default `show` view instead of unrelated completed reminders.
 - Add a release helper for Homebrew tap updates; thanks @dinakars777.
 
