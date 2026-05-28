@@ -10,30 +10,19 @@
    - Run `scripts/generate-version.sh` (refreshes `Sources/remindctl/Version.swift` + embedded Info.plist).
 2. Ensure checks are green
    - `make check`
-3. Build, sign, and notarize (local)
-   - Requires `APP_STORE_CONNECT_API_KEY_P8`, `APP_STORE_CONNECT_KEY_ID`, `APP_STORE_CONNECT_ISSUER_ID`.
-   - `scripts/sign-and-notarize.sh` (outputs `/tmp/remindctl-macos.zip` by default).
-4. Tag, push, and publish
+3. Commit and tag
    - `git tag -a v0.2.0 -m "v0.2.0"`
    - `git push origin v0.2.0`
-   - Extract release notes:
-     ```sh
-     version=0.2.0
-     notes_file=/tmp/release-notes.txt
-     awk -v v="$version" '
-       $0 ~ ("^## " v "($|[[:space:]]-)") { in_section=1; next }
-       in_section && $0 ~ "^## " { exit }
-       in_section { print }
-     ' CHANGELOG.md > "$notes_file"
-     ```
-   - Create GitHub release:
-     ```sh
-     gh release create v0.2.0 /tmp/remindctl-macos.zip -t "v0.2.0" -F /tmp/release-notes.txt
-     ```
-5. Update Homebrew tap
-   - Run `scripts/update-homebrew.sh vX.Y.Z` to trigger and watch the centralized formula updater.
-   - Requires a GitHub token with workflow dispatch access to `steipete/homebrew-tap`.
+4. Autorelease
+   - Pushing `v*` tags runs `.github/workflows/release.yml`.
+   - The workflow builds `remindctl-macos.zip`, creates or updates the GitHub Release, replaces release notes from the matching `CHANGELOG.md` section, then dispatches the Homebrew tap formula updater.
+   - Requires `HOMEBREW_TAP_TOKEN` with workflow dispatch access to `steipete/homebrew-tap`.
+
+## Manual rerun
+- Use the `release` workflow dispatch with `tag=vX.Y.Z` to rebuild an existing tag.
+- Use `scripts/update-homebrew.sh vX.Y.Z` to rerun only the centralized formula updater.
 
 ## What happens in CI
-- Release signing + notarization are done locally via `scripts/sign-and-notarize.sh`.
-- `.github/workflows/release.yml` is only for manual rebuilds, not the primary release path.
+- `.github/workflows/release.yml` runs on pushed `v*` tags and manual dispatch.
+- The GitHub-hosted artifact is ad-hoc signed for Homebrew distribution.
+- `scripts/sign-and-notarize.sh` remains available for local notarized builds when needed.
