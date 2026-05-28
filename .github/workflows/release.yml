@@ -28,16 +28,20 @@ jobs:
       - name: Determine tag
         id: tag
         shell: bash
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+            printf 'tag=%s\n' "$INPUT_TAG" >> "$GITHUB_OUTPUT"
           else
-            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            printf 'tag=%s\n' "$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout release tag
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: git checkout --detach ${{ steps.tag.outputs.tag }}
+        env:
+          RELEASE_TAG: ${{ steps.tag.outputs.tag }}
+        run: git checkout --detach "$RELEASE_TAG"
 
       - name: Resolve packages
         run: swift package resolve
@@ -93,7 +97,9 @@ jobs:
     needs: release
     steps:
       - name: Resolve release tag
-        run: echo "RELEASE_TAG=${{ needs.release.outputs.tag }}" >> "$GITHUB_ENV"
+        env:
+          RELEASE_TAG: ${{ needs.release.outputs.tag }}
+        run: printf 'RELEASE_TAG=%s\n' "$RELEASE_TAG" >> "$GITHUB_ENV"
 
       - name: Dispatch tap formula update
         env:

@@ -5,14 +5,14 @@
 
 ## Steps
 1. Update changelog and version
-   - Ensure `CHANGELOG.md` has `## 0.2.0 - YYYY-MM-DD` with final notes.
-   - Update `version.env` to `0.2.0`.
+   - Ensure `CHANGELOG.md` has `## X.Y.Z - YYYY-MM-DD` with final notes.
+   - Update `version.env` to `X.Y.Z`.
    - Run `scripts/generate-version.sh` (refreshes `Sources/remindctl/Version.swift` + embedded Info.plist).
 2. Ensure checks are green
    - `make check`
 3. Commit and tag
-   - `git tag -a v0.2.0 -m "v0.2.0"`
-   - `git push origin v0.2.0`
+   - `git tag -a vX.Y.Z -m "vX.Y.Z"`
+   - `git push origin vX.Y.Z`
 4. Autorelease
    - Pushing `v*` tags runs `.github/workflows/release.yml`.
    - The workflow builds `remindctl-macos.zip`, creates or updates the GitHub Release, replaces release notes from the matching `CHANGELOG.md` section, then dispatches the Homebrew tap formula updater.
