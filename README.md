@@ -39,6 +39,8 @@ remindctl today
 remindctl overdue
 remindctl open
 remindctl list Work Errands
+remindctl search "milk"
+remindctl info 1
 
 remindctl edit 1 --title "New title" --due 2026-01-04
 remindctl complete 1 2 3
@@ -53,6 +55,8 @@ Indexes such as `1` come from the default reminder listing. Most commands also a
 | --- | --- |
 | `remindctl` / `remindctl today` | Show today's reminders |
 | `remindctl show <filter>` | Show reminders by filter or date |
+| `remindctl search <query>` | Search incomplete reminder titles, notes, and URLs |
+| `remindctl info <id>` | Show detailed reminder metadata |
 | `remindctl list` | Show reminder lists |
 | `remindctl list <name...>` | Show reminders from one or more lists |
 | `remindctl add <title>` | Create a reminder |
@@ -78,6 +82,23 @@ remindctl open
 remindctl completed
 remindctl all
 remindctl 2026-01-03
+```
+
+Search titles, notes, and URLs:
+
+```bash
+remindctl search "milk"
+remindctl search "invoice" --list Work
+remindctl search "project" --completed --json
+```
+
+Standard search output includes stable reminder IDs instead of numeric indexes.
+
+Inspect one reminder:
+
+```bash
+remindctl info 1
+remindctl info 4A83 --json
 ```
 
 Limit a view to one list:

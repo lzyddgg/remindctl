@@ -9,6 +9,8 @@ struct HelpPrinterTests {
     let specs = [
       ShowCommand.spec,
       ListCommand.spec,
+      SearchCommand.spec,
+      InfoCommand.spec,
       AddCommand.spec,
       StatusCommand.spec,
       AuthorizeCommand.spec,
@@ -17,6 +19,8 @@ struct HelpPrinterTests {
     let joined = lines.joined(separator: "\n")
     #expect(joined.contains("show"))
     #expect(joined.contains("list"))
+    #expect(joined.contains("search"))
+    #expect(joined.contains("info"))
     #expect(joined.contains("add"))
     #expect(joined.contains("status"))
     #expect(joined.contains("authorize"))

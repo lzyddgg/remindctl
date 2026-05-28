@@ -47,6 +47,17 @@ enum CommandHelpers {
     return try IDResolver.resolve(inputs, from: reminders, numericFrom: defaultShowReminders)
   }
 
+  static func reminder(_ reminder: ReminderItem, matchesSearch query: String) -> Bool {
+    let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return false }
+    let haystack = [
+      reminder.title,
+      reminder.notes ?? "",
+      reminder.url?.absoluteString ?? "",
+    ].joined(separator: "\n")
+    return haystack.range(of: trimmed, options: [.caseInsensitive, .diacriticInsensitive]) != nil
+  }
+
   private static func parseCustomRecurrence(_ normalized: String, original: String) throws -> RecurrenceRule {
     let parts = normalized.split(separator: " ")
     guard parts.count == 3, parts[0] == "every", let interval = Int(parts[1]), interval > 0 else {

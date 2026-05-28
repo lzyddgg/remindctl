@@ -13,6 +13,8 @@ struct CommandRouter {
     self.specs = [
       ShowCommand.spec,
       ListCommand.spec,
+      SearchCommand.spec,
+      InfoCommand.spec,
       AddCommand.spec,
       EditCommand.spec,
       CompleteCommand.spec,

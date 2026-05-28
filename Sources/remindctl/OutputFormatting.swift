@@ -34,6 +34,19 @@ enum OutputRenderer {
     }
   }
 
+  static func printSearchResults(_ reminders: [ReminderItem], format: OutputFormat) {
+    switch format {
+    case .standard:
+      printSearchResultsStandard(reminders)
+    case .plain:
+      printRemindersPlain(reminders)
+    case .json:
+      printJSON(reminders)
+    case .quiet:
+      Swift.print(reminders.count)
+    }
+  }
+
   static func printLists(_ summaries: [ListSummary], format: OutputFormat) {
     switch format {
     case .standard:
@@ -62,6 +75,19 @@ enum OutputRenderer {
       printJSON(reminder)
     case .quiet:
       break
+    }
+  }
+
+  static func printReminderDetail(_ reminder: ReminderItem, format: OutputFormat) {
+    switch format {
+    case .standard:
+      printReminderDetailStandard(reminder)
+    case .plain:
+      Swift.print(plainLine(for: reminder))
+    case .json:
+      printJSON(reminder)
+    case .quiet:
+      Swift.print(reminder.id)
     }
   }
 
@@ -115,6 +141,63 @@ enum OutputRenderer {
     let sorted = ReminderFiltering.sort(reminders)
     for reminder in sorted {
       Swift.print(plainLine(for: reminder))
+    }
+  }
+
+  private static func printSearchResultsStandard(_ reminders: [ReminderItem]) {
+    let sorted = ReminderFiltering.sort(reminders)
+    guard !sorted.isEmpty else {
+      Swift.print("No reminders found")
+      return
+    }
+    for reminder in sorted {
+      let status = reminder.isCompleted ? "x" : " "
+      let due =
+        reminder.dueDate.map {
+          DateParsing.formatDisplay($0, isDateOnly: reminder.dueDateIsAllDay)
+        } ?? "no due date"
+      let priority = reminder.priority == .none ? "" : " priority=\(reminder.priority.rawValue)"
+      let recurrence = recurrenceSuffix(for: reminder)
+      Swift.print(
+        "[\(status)] \(reminder.title) [\(reminder.listName)] — \(due)\(priority)\(recurrence) id=\(reminder.id)")
+    }
+  }
+
+  private static func printReminderDetailStandard(_ reminder: ReminderItem) {
+    Swift.print("ID: \(reminder.id)")
+    Swift.print("Title: \(reminder.title)")
+    Swift.print("List: \(reminder.listName)")
+    Swift.print("Status: \(reminder.isCompleted ? "completed" : "open")")
+    Swift.print("Priority: \(reminder.priority.rawValue)")
+
+    if let dueDate = reminder.dueDate {
+      Swift.print("Due: \(DateParsing.formatDisplay(dueDate, isDateOnly: reminder.dueDateIsAllDay))")
+    }
+    if let alarmDate = reminder.alarmDate {
+      Swift.print("Alarm: \(DateParsing.formatDisplay(alarmDate))")
+    }
+    if let recurrenceRule = reminder.recurrenceRule {
+      Swift.print("Repeat: \(recurrenceRule.displayString)")
+    }
+    if let locationTrigger = reminder.locationTrigger {
+      Swift.print(
+        "Location: \(locationTrigger.address) (\(locationTrigger.proximity.rawValue), \(locationTrigger.radius)m)")
+    }
+    if let url = reminder.url {
+      Swift.print("URL: \(url.absoluteString)")
+    }
+    if let creationDate = reminder.creationDate {
+      Swift.print("Created: \(DateParsing.formatDisplay(creationDate))")
+    }
+    if let lastModifiedDate = reminder.lastModifiedDate {
+      Swift.print("Modified: \(DateParsing.formatDisplay(lastModifiedDate))")
+    }
+    if let completionDate = reminder.completionDate {
+      Swift.print("Completed: \(DateParsing.formatDisplay(completionDate))")
+    }
+    if let notes = reminder.notes, !notes.isEmpty {
+      Swift.print("Notes:")
+      Swift.print(notes)
     }
   }
 
