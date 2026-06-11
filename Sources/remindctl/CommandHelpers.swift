@@ -24,6 +24,19 @@ enum CommandHelpers {
     return parsed
   }
 
+  static func parseURL(_ value: String) throws -> URL {
+    let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard
+      !trimmed.isEmpty,
+      let url = URL(string: trimmed),
+      let scheme = url.scheme,
+      !scheme.isEmpty
+    else {
+      throw RemindCoreError.operationFailed("Invalid URL: \"\(value)\" (include a scheme like https://)")
+    }
+    return url
+  }
+
   static func parseRecurrence(_ value: String) throws -> RecurrenceRule {
     let normalized = value.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
     switch normalized {
