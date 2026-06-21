@@ -50,7 +50,7 @@ jobs:
         run: scripts/generate-version.sh
 
       - name: Build
-        run: swift build -c release --product remindctl
+        run: swift build -c release --product remindctl --arch x86_64
 
       - name: Codesign
         run: codesign --force --sign - --identifier com.steipete.remindctl .build/release/remindctl
