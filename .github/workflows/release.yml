@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   release:
-    runs-on: macos-15
+    runs-on: macos-14
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
